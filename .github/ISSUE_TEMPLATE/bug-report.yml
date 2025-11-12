@@ -1,6 +1,7 @@
-name: "Bug Report"
-labels: ["bug (game)"]
-fields:
+name: "Bug report"
+description: "Report something not working correctly in the game."
+labels: ["bug"]
+body:
 - type: "textarea"
   attributes:
     label: "Describe the bug"
