@@ -1,0 +1,27 @@
+name: "Bug Report"
+labels: ["bug (game)"]
+fields:
+- type: "textarea"
+  attributes:
+    label: "Describe the bug"
+    description: "A clear and concise description of what the bug is."
+  validations:
+    required: true
+- type: "textarea"
+  attributes:
+    label: "Steps to reproduce"
+    description: "Steps to reproduce the behavior."
+  validations:
+    required: true
+- type: "textarea"
+  attributes:
+    label: "Expected behaviour"
+    description: "A clear and concise description of what you expected to happen. If it's a crash, \"It shouldn't crash.\" is a valid response."
+  validations:
+    required: true
+- type: "textarea"
+  attributes:
+    label: "Additional files"
+    description: "If applicable, attach screenshots or log files that help explain the bug."
+  validations:
+    required: false
