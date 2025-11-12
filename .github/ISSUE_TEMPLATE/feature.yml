@@ -1,0 +1,10 @@
+name: "New feature or behaviour change"
+description: "Suggest a new feature or enhancement to an existing one"
+labels: ["enhancement"]
+body:
+- type: "textarea"
+  attributes:
+    label: "Describe the feature or enhancement"
+    description: "A clear and concise description of what the feature should do and the benefits it would provide."
+  validations:
+    required: true
