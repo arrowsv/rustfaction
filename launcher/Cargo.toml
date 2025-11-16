@@ -1,0 +1,13 @@
+[package]
+name = "launcher"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+common = { path = "../common" }
+windows = { workspace = true }
+log = { workspace = true }
+anyhow = { workspace = true }
+eframe = { workspace = true }
+rfd = { workspace = true }
+egui_extras = { workspace = true }
