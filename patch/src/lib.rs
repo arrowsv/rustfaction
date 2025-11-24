@@ -34,34 +34,13 @@ fn init_patch() -> Result<()> {
     
     init_logging(log_dir, "patch")?;
 
-    
     let module_base = unsafe { GetModuleHandleA(None)?.0 as usize};
     utils::address::set_module_base(module_base);
 
     hooks::init()?;
 
-    log::info!("Patch initialized successfully");
-
     Ok(())
 }
-
-// fn init_logging() -> Result<()> {
-//     let log_dir = common::utils::get_module_dir(get_dll_module())
-//         .context("Failed to get patch directory for logging")?.join("logs");
-
-//     flexi_logger::Logger::try_with_str("info")?
-//         .log_to_file(
-//             flexi_logger::FileSpec::default()
-//                 .directory(log_dir)
-//                 .basename("patch")
-//                 .suppress_timestamp(),
-//         )
-//         .duplicate_to_stderr(flexi_logger::Duplicate::Info)
-//         .start()?;
-    
-//     log::info!("Logging initialized");
-//     Ok(())
-// }
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case, unused_variables)]
@@ -74,19 +53,10 @@ extern "system" fn DllMain(
         DLL_PROCESS_ATTACH => {
             let module = HMODULE(dll_module.0);
             let _ = unsafe { DisableThreadLibraryCalls(module) };
-
-            match DLL_MODULE.set(module) {
-                Ok(_) => {}
-                Err(_) => {
-                    common::utils::show_error_message("DLL module already set");
-                    return BOOL(0);
-                }
-            }
-            
+            DLL_MODULE.set(module).ok();
             thread::spawn(|| {
                 if let Err(e) = init_patch() {
                     common::utils::show_error_message(&format!("Error initializing patch: {}", e));
-                    log::error!("Error initializing patch: {}", e);
                 }
             });
         }
