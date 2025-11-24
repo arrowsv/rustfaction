@@ -23,7 +23,7 @@ pub fn get_dll_module() -> HMODULE {
 }
 
 fn init_patch() -> Result<()> {
-    Config::load();
+    Config::init();
     
     if Config::get().show_console {
         unsafe { AllocConsole(); }

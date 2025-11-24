@@ -30,22 +30,14 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn load() {
-        let path = Self::path();
-
-        let config = match Self::load_from_file(&path) {
-            Ok(config) => config,
-            Err(e) => {
-                log::warn!("Failed to load config from {}: {}", path.display(), e);
-                let default = Self::default();
-                default.save().unwrap_or_else(|e| {
-                    log::error!("Failed to save default config: {}", e);
-                });
-                default
-            }
-        };
-
-        *CONFIG.write().unwrap() = config;
+    pub fn init() {
+        *CONFIG.write().unwrap() = Self::load_from_file(&Self::path()).unwrap_or_else(|_| {
+            let default = Self::default();
+            default.save().unwrap_or_else(|e| {
+                log::error!("Failed to save default config: {}", e);
+            });
+            default
+        })
     }
 
     fn load_from_file(path: &Path) -> Result<Self> {
@@ -55,12 +47,10 @@ impl Config {
     }
 
     pub fn save(&self) -> Result<()> {
-        let path = Self::ensure_config_dir()?;
-
         let content = toml::to_string_pretty(self)
             .context("Failed to serialize config")?;
 
-        std::fs::write(&path, content)
+        std::fs::write(&Self::path(), content)
             .context("Failed to write config file")?;
 
         Ok(())
@@ -73,26 +63,21 @@ impl Config {
     pub fn set(new_config: Self) {
         let mut config = CONFIG.write().unwrap();
         *config = new_config;
-        if let Err(e) = config.save() {
-            log::error!("Failed to save config: {}", e);
-        }
-    }
-
-    fn ensure_config_dir() -> Result<PathBuf> {
-        let dir = Self::path().parent()
-            .context("Config file has no parent directory")?
-            .to_path_buf();
-
-        std::fs::create_dir_all(&dir)
-            .context("Failed to create config directory")?;
-
-        Ok(dir)
+        config.save().unwrap_or_else(|e| {
+            log::error!("Failed to save updated config: {}", e);
+        })
     }
 
     fn path() -> PathBuf {
-        dirs::config_dir()
-            .unwrap_or_else(|| std::env::current_dir().expect("Failed to get current directory"))
-            .join("Rust Faction")
-            .join("config.toml")
+        let config_file = dirs::config_dir().unwrap().join("Rust Faction/config.toml");
+        let config_file_dir = config_file.parent().expect("Config file should have parent");
+        
+        if !config_file_dir.exists() {
+            std::fs::create_dir_all(&config_file_dir).unwrap_or_else(|e| {
+                log::error!("Failed to create config directory ({}): {}", config_file_dir.display(), e)
+            });
+        }
+
+        config_file
     }
 }

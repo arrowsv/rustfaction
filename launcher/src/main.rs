@@ -9,7 +9,7 @@ mod app;
 
 fn main() -> Result<()> {
     init_logging(PathBuf::from("logs"), "launcher")?;
-    Config::load();
+    Config::init();
 
     match app::run() {
         Ok(_) => {},
@@ -19,7 +19,7 @@ fn main() -> Result<()> {
             std::process::exit(1);
         }
     }
-
+    
     Ok(())
 }
 
